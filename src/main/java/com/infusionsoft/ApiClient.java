@@ -89,9 +89,20 @@ public class ApiClient {
 
         // Setup authentications (key: authentication name, value: authentication).
         authentications = new HashMap<String, Authentication>();
-        authentications.put("oauth2", new OAuth());
+        authentications.put(ApiAuth.OAUTH.name, new OAuth());
         // Prevent the authentications from being modified.
         authentications = Collections.unmodifiableMap(authentications);
+    }
+
+
+    private enum ApiAuth {
+        OAUTH("oauth2");
+
+        public String name;
+
+        private ApiAuth(String auth) {
+            this.name = auth;
+        }
     }
 
     /**
@@ -1081,11 +1092,8 @@ public class ApiClient {
      * @param headerParams  Map of header parameters
      */
     public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams) {
-        for (String authName : authNames) {
-            Authentication auth = authentications.get(authName);
-            if (auth == null) throw new RuntimeException("Authentication undefined: " + authName);
-            auth.applyToParams(queryParams, headerParams);
-        }
+        Authentication auth = authentications.get(ApiAuth.OAUTH.name);
+        auth.applyToParams(queryParams, headerParams);
     }
 
     /**
